@@ -29,34 +29,27 @@ export async function POST(_request: Request, context: Context) {
       );
     }
 
-    if (selectedEvent.status !== "new") {
+    if (selectedEvent.status !== "review_required") {
       return NextResponse.json(
-        { error: "Only new events can be processed." },
+        { error: "Only review-required events can be completed." },
         { status: 409 }
       );
     }
 
-    const processingEvent = updateFeedbackEventStatus(eventId, "processing");
-    if (!processingEvent) {
+    const completedEvent = updateFeedbackEventStatus(eventId, "completed");
+    if (!completedEvent) {
       return NextResponse.json(
-        { error: "Event cannot transition to processing." },
+        { error: "Event cannot transition to completed." },
         { status: 409 }
       );
 
     }
 
-    const reviewEvent = updateFeedbackEventStatus(eventId, "review_required");
-    if (!reviewEvent) {
-      return NextResponse.json(
-        { error: "Event cannot transition to review required." },
-        { status: 409 }
-      );
-    }
 
     return NextResponse.json(
       {
         ok: true,
-        event: reviewEvent,
+        event: completedEvent,
       },
       { status: 200 }
     );

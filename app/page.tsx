@@ -51,9 +51,20 @@ export default function Home() {
     loadEvents();
   }, [loadEvents]);
 
+  const totalItems = events.length;
+  const newItemsCount = events.filter(
+    (event) => event.status === "new"
+  ).length;
+  const reviewRequiredCount = events.filter(
+    (event) => event.status === "review_required"
+  ).length;
+  const completedCount = events.filter(
+    (event) => event.status === "completed"
+  ).length;
+
   const handleProcessClick = async (
-  id: string,
-  currentStatus: FeedbackEvent["status"]
+    id: string,
+    currentStatus: FeedbackEvent["status"]
   ) => {
     if (!id || currentStatus !== "new") {
       return;
@@ -82,15 +93,77 @@ export default function Home() {
     }
   };
 
+  const handleCompleteClick = async (
+    id: string,
+    currentStatus: FeedbackEvent["status"]
+  ) => {
+    if (!id || currentStatus !== "review_required") {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/events/client-feedback/${id}/complete`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          responseData.error || "Failed to complete feedback event."
+        );
+      }
+
+      await loadEvents(id);
+    } catch (error) {
+      console.error("Failed to complete event:", error);
+    }
+  }
+
+  const handlePrimaryActionClick = async (event: FeedbackEvent) => {
+    if (event.status === "new") {
+      await handleProcessClick(event.id, event.status);
+      return;
+    }
+
+    if (event.status === "review_required") {
+      await handleCompleteClick(event.id, event.status);
+    }
+  };
+
+  function getPrimaryActionLabel(status: FeedbackEvent["status"]) {
+
+    switch (status) {
+      case "new":
+        return "Process Event";
+      case "processing":
+        return "Processing…";
+      case "review_required":
+        return "Mark Completed";
+      case "completed":
+        return "Completed";
+    }
+  }
+
   return (
     <div className="flex h-screen w-full bg-zinc-50 font-sans text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50">
       {/* Sidebar / Inbox List */}
       <aside className="flex w-full flex-col border-r border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900 sm:w-80 md:w-96">
         {/* Header */}
         <div className="flex h-16 items-center justify-between border-b border-zinc-200 px-4 dark:border-zinc-800">
-          <h1 className="text-lg font-semibold tracking-tight">Feedback Inbox</h1>
+          <div>
+            <h1 className="text-lg font-semibold tracking-tight">Feedback Inbox</h1>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              {newItemsCount} new · {reviewRequiredCount} in review
+            </p>
+          </div>
+
           <span className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
-            {events.length} total
+            {totalItems} total
           </span>
         </div>
 
@@ -107,9 +180,8 @@ export default function Home() {
                 <button
                   key={event.id}
                   onClick={() => setSelectedEvent(event)}
-                  className={`flex w-full flex-col gap-1 p-4 text-left transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50 ${
-                    isSelected ? "bg-zinc-100 dark:bg-zinc-800" : ""
-                  }`}
+                  className={`flex w-full flex-col gap-1 p-4 text-left transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50 ${isSelected ? "bg-zinc-100 dark:bg-zinc-800" : ""
+                    }`}
                 >
                   <div className="flex w-full items-center justify-between gap-2">
                     <span className="inline-flex items-center rounded bg-blue-50 px-1.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
@@ -126,11 +198,10 @@ export default function Home() {
                     {event.message}
                   </p>
                   <div className="mt-1">
-                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                      event.status === "completed" 
+                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${event.status === "completed"
                         ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400"
                         : "bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400"
-                    }`}>
+                      }`}>
                       {event.status}
                     </span>
                   </div>
@@ -151,11 +222,10 @@ export default function Home() {
                 <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
                   Status:
                 </span>
-                <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                  selectedEvent.status === "completed" 
+                <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${selectedEvent.status === "completed"
                     ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
                     : "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400"
-                }`}>
+                  }`}>
                   {selectedEvent.status}
                 </span>
               </div>
@@ -189,17 +259,11 @@ export default function Home() {
                 {/* Process Button */}
                 <div className="mt-6 flex justify-center gap-2">
                   <button
-                    onClick={() => handleProcessClick(selectedEvent.id, selectedEvent.status)}
-                    disabled={selectedEvent.status !== "new"}
+                    onClick={() => handlePrimaryActionClick(selectedEvent)}
+                    disabled={selectedEvent.status !== "new" && selectedEvent.status !== "review_required"}
                     className="inline-flex items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-500 dark:bg-zinc-100 dark:text-zinc-900 dark:disabled:bg-zinc-800 dark:disabled:text-zinc-500"
                   >
-                    {selectedEvent.status === "new"
-                      ? "Process Event"
-                      : selectedEvent.status === "processing"
-                        ? "Processing…"
-                        : selectedEvent.status === "review_required"
-                          ? "Review Required"
-                          : "Completed"}
+                    {getPrimaryActionLabel(selectedEvent.status)}
                   </button>
                 </div>
               </div>
