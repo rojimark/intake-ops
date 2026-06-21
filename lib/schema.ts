@@ -3,7 +3,7 @@ import { z } from "zod";
 export const FeedbackEventSchema = z.object({
     id: z.string(),
     source: z.enum(["email", "form", "manual"]),
-    receivedAt: z.date(),
+    receivedAt: z.iso.datetime(),
     status: z.enum(["new", "processing", "review_required", "completed"]),
     message: z.string(),
 });
