@@ -21,27 +21,41 @@ export default function Home() {
 
       setEvents(eventList);
 
-      if (eventList.length === 0) {
-        setSelectedEvent(null);
-        return;
-      }
+      setSelectedEvent((currentSelectedEvent) => {
+        if (eventList.length === 0) {
+          return null;
+        }
 
-      const nextSelectedEvent = selectedEventId
-        ? eventList.find((event) => event.id === selectedEventId) ?? eventList[0]
-        : selectedEvent ?? eventList[0];
+        if (selectedEventId) {
+          return (
+            eventList.find((event) => event.id === selectedEventId) ??
+            eventList[0]
+          );
+        }
 
-      setSelectedEvent(nextSelectedEvent);
+        if (currentSelectedEvent) {
+          return (
+            eventList.find((event) => event.id === currentSelectedEvent.id) ??
+            eventList[0]
+          );
+        }
+
+        return eventList[0];
+      });
     } catch (error) {
       console.error("Failed to fetch events:", error);
     }
-  }, [selectedEvent]);
+  }, []);
 
   useEffect(() => {
     loadEvents();
   }, [loadEvents]);
 
-  const handleProcessClick = async (id: string) => {
-    if (!id) {
+  const handleProcessClick = async (
+  id: string,
+  currentStatus: FeedbackEvent["status"]
+  ) => {
+    if (!id || currentStatus !== "new") {
       return;
     }
 
@@ -55,10 +69,11 @@ export default function Home() {
       });
 
       const responseData = await response.json();
-      console.log(responseData);
 
       if (!response.ok) {
-        throw new Error(responseData.error || "Failed to process feedback event.");
+        throw new Error(
+          responseData.error || "Failed to process feedback event."
+        );
       }
 
       await loadEvents(id);
@@ -174,9 +189,18 @@ export default function Home() {
                 {/* Process Button */}
                 <div className="mt-6 flex justify-center gap-2">
                   <button
-                    onClick={() => handleProcessClick(selectedEvent.id)}
-                    className="items-center justify-center rounded-md"
-                    >Process</button>
+                    onClick={() => handleProcessClick(selectedEvent.id, selectedEvent.status)}
+                    disabled={selectedEvent.status !== "new"}
+                    className="inline-flex items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-500 dark:bg-zinc-100 dark:text-zinc-900 dark:disabled:bg-zinc-800 dark:disabled:text-zinc-500"
+                  >
+                    {selectedEvent.status === "new"
+                      ? "Process Event"
+                      : selectedEvent.status === "processing"
+                        ? "Processing…"
+                        : selectedEvent.status === "review_required"
+                          ? "Review Required"
+                          : "Completed"}
+                  </button>
                 </div>
               </div>
             </div>
