@@ -14,7 +14,10 @@ export const RiskTypeSchema = z.enum([
   "scope_creep",
   "blocked_work",
   "unclear_request",
+  "stakeholder_conflict",
+  "dependency_risk",
 ]);
+
 
 export const OperationsRecordSchema = z.object({
   id: z.string(),
@@ -30,6 +33,13 @@ export const OperationsRecordSchema = z.object({
   createdAt: z.iso.datetime(),
 });
 
+export const OperationsAnalysisSchema = OperationsRecordSchema.omit({
+  id: true,
+  eventId: true,
+  createdAt: true,
+});
+
+export type OperationsAnalysis = z.infer<typeof OperationsAnalysisSchema>;
 export type FeedbackEvent = z.infer<typeof FeedbackEventSchema>;
 export type OperationsRecord = z.infer<typeof OperationsRecordSchema>;
 export type RiskType = z.infer<typeof RiskTypeSchema>;

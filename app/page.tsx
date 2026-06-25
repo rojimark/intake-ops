@@ -1,10 +1,12 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import { FeedbackEvent } from "@/lib/schema";
+import { FeedbackEvent, OperationsRecord } from "@/lib/schema";
 
 export default function Home() {
   const [events, setEvents] = useState<FeedbackEvent[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<FeedbackEvent | null>(null);
+  const [selectedEventRecord, setSelectedEventRecord] = useState<OperationsRecord | null>(null);
+  const [isRecordLoading, setIsRecordLoading] = useState(false);
 
   const loadEvents = useCallback(async (selectedEventId?: string) => {
     try {
@@ -47,9 +49,60 @@ export default function Home() {
     }
   }, []);
 
+  async function getOperationsRecord(eventId: FeedbackEvent["id"]) {
+    const response = await fetch(
+      `/api/events/client-feedback/${eventId}/operations-record`,
+      {
+        cache: "no-store",
+      }
+    );
+
+    if (response.status === 404) {
+      return null;
+    }
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch operations record.");
+    }
+
+    const data = await response.json();
+    return data.record as OperationsRecord | null;
+  }
+
   useEffect(() => {
     loadEvents();
   }, [loadEvents]);
+
+  useEffect(() => {
+    async function loadSelectedEventRecord() {
+      if (!selectedEvent) {
+        setSelectedEventRecord(null);
+        return;
+      }
+
+      if (
+        selectedEvent.status !== "review_required" &&
+        selectedEvent.status !== "completed"
+      ) {
+        setSelectedEventRecord(null);
+        return;
+      }
+
+      try {
+        setIsRecordLoading(true);
+
+        const record = await getOperationsRecord(selectedEvent.id);
+        setSelectedEventRecord(record);
+      } catch (error) {
+        console.error("Failed to fetch operations record:", error);
+        setSelectedEventRecord(null);
+      } finally {
+        setIsRecordLoading(false);
+      }
+    }
+
+    loadSelectedEventRecord();
+  }, [selectedEvent]);
 
   const totalItems = events.length;
   const newItemsCount = events.filter(
@@ -122,7 +175,7 @@ export default function Home() {
     } catch (error) {
       console.error("Failed to complete event:", error);
     }
-  }
+  };
 
   const handlePrimaryActionClick = async (event: FeedbackEvent) => {
     if (event.status === "new") {
@@ -148,6 +201,7 @@ export default function Home() {
         return "Completed";
     }
   }
+
 
   return (
     <div className="flex h-screen w-full bg-zinc-50 font-sans text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50">
@@ -199,8 +253,8 @@ export default function Home() {
                   </p>
                   <div className="mt-1">
                     <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${event.status === "completed"
-                        ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400"
-                        : "bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400"
+                      ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400"
+                      : "bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400"
                       }`}>
                       {event.status}
                     </span>
@@ -223,8 +277,8 @@ export default function Home() {
                   Status:
                 </span>
                 <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${selectedEvent.status === "completed"
-                    ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
-                    : "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400"
+                  ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
+                  : "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400"
                   }`}>
                   {selectedEvent.status}
                 </span>
@@ -266,6 +320,98 @@ export default function Home() {
                     {getPrimaryActionLabel(selectedEvent.status)}
                   </button>
                 </div>
+                {/* operations Record Detail */}
+                {selectedEvent.status === "new" ? (
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center pt-4">
+                    Process this event to generate an operations record.
+                  </p>
+                ) : selectedEvent.status === "processing" ? (
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center pt-4">
+                    Processing this event…
+                  </p>
+                ) : (
+                  <div className="mt-6 border-t border-zinc-100 pt-6 dark:border-zinc-800">
+                    <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                      Operations Record
+                    </h3>
+
+                    {isRecordLoading ? (
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                        Loading operations record…
+                      </p>
+                    ) : selectedEventRecord ? (
+                      <div className="space-y-4 rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-950">
+                        <div>
+                          <p className="text-xs text-zinc-400">Summary</p>
+                          <p className="text-sm text-zinc-700 dark:text-zinc-300">
+                            {selectedEventRecord.summary}
+                          </p>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-xs text-zinc-400">Priority</p>
+                            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                              {selectedEventRecord.priority}
+                            </p>
+                          </div>
+
+                          <div>
+                            <p className="text-xs text-zinc-400">Needs Response</p>
+                            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                              {selectedEventRecord.needsResponse ? "Yes" : "No"}
+                            </p>
+                          </div>
+
+                          <div>
+                            <p className="text-xs text-zinc-400">Sentiment</p>
+                            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                              {selectedEventRecord.sentiment}
+                            </p>
+                          </div>
+
+                          <div>
+                            <p className="text-xs text-zinc-400">Confidence</p>
+                            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                              {selectedEventRecord.confidence}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div>
+                          <p className="text-xs text-zinc-400">Action Items</p>
+                          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-zinc-700 dark:text-zinc-300">
+                            {selectedEventRecord.actionItems.map((item, index) => (
+                              <li key={`${item}-${index}`}>{item}</li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        <div>
+                          <p className="text-xs text-zinc-400">Risks</p>
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {selectedEventRecord.risks.map((risk, index) => (
+                              <span key={`${risk}-${index}`}>
+                                {risk}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div>
+                          <p className="text-xs text-zinc-400">Suggested Response</p>
+                          <p className="mt-2 whitespace-pre-wrap rounded-md bg-white p-3 text-sm text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
+                            {selectedEventRecord.suggestedResponse}
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                        No operations record yet. Process this event to generate one.
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>

@@ -1,6 +1,14 @@
 import { FeedbackEvent } from "@/lib/schema";
 
-const events: FeedbackEvent[] = [];
+const globalForFeedbackEvents = globalThis as unknown as {
+  feedbackEvents?: FeedbackEvent[];
+};
+
+const events = globalForFeedbackEvents.feedbackEvents ?? [];
+
+if (!globalForFeedbackEvents.feedbackEvents) {
+  globalForFeedbackEvents.feedbackEvents = events;
+}
 
 const allowedStatusTransitions: Record<
   FeedbackEvent["status"],
@@ -41,6 +49,7 @@ export function updateFeedbackEventStatus(
   if (!event) {
     return null;
   }
+
   if (!canTransitionFeedbackEventStatus(event.status, status)) {
     return null;
   }
