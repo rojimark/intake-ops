@@ -4,7 +4,7 @@ export const FeedbackEventSchema = z.object({
   id: z.string(),
   source: z.enum(["email", "form", "manual"]),
   receivedAt: z.iso.datetime(),
-  status: z.enum(["new", "processing", "review_required", "completed"]),
+  status: z.enum(["new", "processing", "review_required", "completed", "failed"]),
   message: z.string(),
 });
 

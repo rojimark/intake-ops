@@ -7,6 +7,8 @@ export default function Home() {
   const [selectedEvent, setSelectedEvent] = useState<FeedbackEvent | null>(null);
   const [selectedEventRecord, setSelectedEventRecord] = useState<OperationsRecord | null>(null);
   const [isRecordLoading, setIsRecordLoading] = useState(false);
+  const [isProcessLoading, setIsProcessLoading] = useState(false);
+
 
   const loadEvents = useCallback(async (selectedEventId?: string) => {
     try {
@@ -124,6 +126,9 @@ export default function Home() {
     }
 
     try {
+      if(currentStatus === "new"){
+        setIsProcessLoading(true);
+      }
       const response = await fetch(`/api/events/client-feedback/${id}/process`, {
         method: "POST",
         headers: {
@@ -141,6 +146,7 @@ export default function Home() {
       }
 
       await loadEvents(id);
+      setIsProcessLoading(false);
     } catch (error) {
       console.error("Failed to process event:", error);
     }
@@ -178,7 +184,7 @@ export default function Home() {
   };
 
   const handlePrimaryActionClick = async (event: FeedbackEvent) => {
-    if (event.status === "new") {
+    if (event.status === "new" || event.status === "failed") {
       await handleProcessClick(event.id, event.status);
       return;
     }
@@ -314,16 +320,20 @@ export default function Home() {
                 <div className="mt-6 flex justify-center gap-2">
                   <button
                     onClick={() => handlePrimaryActionClick(selectedEvent)}
-                    disabled={selectedEvent.status !== "new" && selectedEvent.status !== "review_required"}
+                    disabled={selectedEvent.status !== "new" && selectedEvent.status !== "review_required" && selectedEvent.status !== "failed"}
                     className="inline-flex items-center justify-center rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-500 dark:bg-zinc-100 dark:text-zinc-900 dark:disabled:bg-zinc-800 dark:disabled:text-zinc-500"
                   >
                     {getPrimaryActionLabel(selectedEvent.status)}
                   </button>
                 </div>
                 {/* operations Record Detail */}
-                {selectedEvent.status === "new" ? (
+                {selectedEvent.status === "new" && !isProcessLoading ? (
                   <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center pt-4">
                     Process this event to generate an operations record.
+                  </p>
+                  ) : selectedEvent.status === "new" && isProcessLoading ? (
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center pt-4">
+                    Processing... Please wait...
                   </p>
                 ) : selectedEvent.status === "processing" ? (
                   <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center pt-4">

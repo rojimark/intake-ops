@@ -18,6 +18,7 @@ const allowedStatusTransitions: Record<
   processing: ["review_required"],
   review_required: ["completed"],
   completed: [],
+  failed:["processing"],
 };
 
 function canTransitionFeedbackEventStatus(
