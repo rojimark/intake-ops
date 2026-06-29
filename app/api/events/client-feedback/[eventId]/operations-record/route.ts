@@ -16,7 +16,7 @@ export async function GET(_request: Request, context: Context) {
       );
     }
 
-    const record = getOperationsRecordByEventId(eventId);
+    const record = await getOperationsRecordByEventId(eventId);
 
     if (!record) {
       return NextResponse.json(

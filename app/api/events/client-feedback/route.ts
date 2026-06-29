@@ -34,11 +34,10 @@ export async function POST(request: Request) {
       message,
     };
 
-    addFeedbackEvent(feedbackEvent);
-
+    const createdEvent = await addFeedbackEvent(feedbackEvent);
     return NextResponse.json(
       {
-        event: feedbackEvent,
+        event: createdEvent,
         message: "Feedback event received successfully.",
       },
       { status: 201 }
@@ -55,7 +54,7 @@ export async function POST(request: Request) {
 
 export async function GET() {
   return NextResponse.json(
-    {events: getFeedbackEvents()},
-    {status:200}
+    { events: await getFeedbackEvents() },
+    { status: 200 }
   );
 }

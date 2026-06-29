@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import {
-  getFeedbackEvents,
   updateFeedbackEventStatus,
+  getFeedbackEventById
 } from "@/lib/feedback-event-store";
 
 interface Context {
@@ -19,8 +19,7 @@ export async function POST(_request: Request, context: Context) {
       );
     }
 
-    const events = getFeedbackEvents();
-    const selectedEvent = events.find((event) => event.id === eventId);
+    const selectedEvent = await getFeedbackEventById(eventId);
 
     if (!selectedEvent) {
       return NextResponse.json(
@@ -36,7 +35,7 @@ export async function POST(_request: Request, context: Context) {
       );
     }
 
-    const completedEvent = updateFeedbackEventStatus(eventId, "completed");
+    const completedEvent = await updateFeedbackEventStatus(eventId, "completed");
     if (!completedEvent) {
       return NextResponse.json(
         { error: "Event cannot transition to completed." },

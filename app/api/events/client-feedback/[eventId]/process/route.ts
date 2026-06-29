@@ -25,7 +25,7 @@ export async function POST(_request: Request, context: Context) {
       );
     }
 
-    const selectedEvent = getFeedbackEventById(eventId);
+    const selectedEvent = await getFeedbackEventById(eventId);
 
     if (!selectedEvent) {
       return NextResponse.json(
@@ -41,7 +41,7 @@ export async function POST(_request: Request, context: Context) {
       );
     }
 
-    const processingEvent = updateFeedbackEventStatus(eventId, "processing");
+    const processingEvent = await updateFeedbackEventStatus(eventId, "processing");
 
     if (!processingEvent) {
       return NextResponse.json(
@@ -105,7 +105,7 @@ A communication may contain multiple risk flags. Return all applicable risks.`,
       const analysis = OperationsAnalysisSchema.safeParse(parsedJson);
 
       if (!analysis.success) {
-        updateFeedbackEventStatus(eventId, "failed");
+        await updateFeedbackEventStatus(eventId, "failed");
 
         return NextResponse.json(
           {
@@ -126,10 +126,10 @@ A communication may contain multiple risk flags. Return all applicable risks.`,
 
       addOperationsRecord(operationsRecord);
 
-      const reviewEvent = updateFeedbackEventStatus(eventId, "review_required");
+      const reviewEvent = await updateFeedbackEventStatus(eventId, "review_required");
 
       if (!reviewEvent) {
-        updateFeedbackEventStatus(eventId, "failed");
+        await updateFeedbackEventStatus(eventId, "failed");
 
         return NextResponse.json(
           { error: "Event cannot transition to review required." },
@@ -148,7 +148,7 @@ A communication may contain multiple risk flags. Return all applicable risks.`,
     } catch (error) {
       console.error("Failed to process event with AI:", error);
 
-      updateFeedbackEventStatus(eventId, "failed");
+      await updateFeedbackEventStatus(eventId, "failed");
 
       return NextResponse.json(
         {
