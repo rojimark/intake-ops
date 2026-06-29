@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model FeedbackEvent {
+  id         String   @id @default(uuid())
+  source     String
+  receivedAt DateTime @default(now())
+  status     String
+  message    String
+
+  operationsRecord OperationsRecord?
+}
+
+model OperationsRecord {
+  id                String   @id @default(uuid())
+  eventId           String   @unique
+  summary           String
+  sentiment         String
+  priority          String
+  needsResponse     Boolean
+  actionItems       Json
+  risks             Json
+  suggestedResponse String
+  confidence        String
+  createdAt         DateTime @default(now())
+
+  event FeedbackEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
