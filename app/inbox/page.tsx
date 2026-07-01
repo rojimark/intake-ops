@@ -2,12 +2,15 @@
 import { useState, useEffect, useCallback } from "react";
 import { FeedbackEvent, OperationsRecord } from "@/lib/schema";
 
+type InboxFilter = "all" | FeedbackEvent["status"];
+
 export default function Inbox() {
   const [events, setEvents] = useState<FeedbackEvent[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<FeedbackEvent | null>(null);
   const [selectedEventRecord, setSelectedEventRecord] = useState<OperationsRecord | null>(null);
   const [isRecordLoading, setIsRecordLoading] = useState(false);
   const [isProcessLoading, setIsProcessLoading] = useState(false);
+  const [activeFilter, setActiveFilter] = useState("all");
 
 
   const loadEvents = useCallback(async (selectedEventId?: string) => {
@@ -119,6 +122,8 @@ export default function Inbox() {
   const failedItemsCount = events.filter(
     (event) => event.status === "failed"
   ).length;
+  const filteredEvents = activeFilter === "all" ?
+    events : events.filter((event) => event.status === activeFilter);
 
   const handleProcessClick = async (
     id: string,
@@ -230,7 +235,28 @@ export default function Inbox() {
             {totalItems} total
           </span>
         </div>
-
+        {/* Filters */}
+        <div className="flex flex-wrap gap-2 border-b border-zinc-200 p-3 dark:border-zinc-800">
+          {[
+            { label: "All", value: "all" },
+            { label: "New", value: "new" },
+            { label: "In Review", value: "review_required" },
+            { label: "Failed", value: "failed" },
+            { label: "Completed", value: "completed" },
+          ].map((filter) => (
+            <button
+              key={filter.value}
+              type="button"
+              onClick={() => setActiveFilter(filter.value as InboxFilter)}
+              className={`rounded-full px-3 py-1 text-xs font-medium ${activeFilter === filter.value
+                  ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
+                  : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                }`}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
         {/* List Container */}
         <div className="flex-1 overflow-y-auto divide-y divide-zinc-100 dark:divide-zinc-800/50">
           {events.length === 0 ? (
@@ -238,7 +264,7 @@ export default function Inbox() {
               No feedback messages found.
             </div>
           ) : (
-            events.map((event) => {
+            filteredEvents.map((event) => {
               const isSelected = selectedEvent?.id === event.id;
               return (
                 <button
