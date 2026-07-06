@@ -56,8 +56,39 @@ export const ProjectContextSchema = z.object({
   updatedAt: z.iso.datetime(),
 });
 
+export const OperationsContextPackageSchema = z.object({
+  contextVersion: z.literal("operations_context_v1"),
+
+  event: z.object({
+    id: z.string(),
+    source: z.enum(["email", "form", "manual"]),
+    receivedAt: z.iso.datetime(),
+    message: z.string(),
+  }),
+
+  projectContext: ProjectContextSchema.nullable(),
+
+  recentOperationsRecords: z.array(
+    z.object({
+      id: z.string(),
+      eventId: z.string(),
+      summary: z.string(),
+      priority: z.enum(["high", "medium", "low"]),
+      risks: z.array(RiskTypeSchema),
+      createdAt: z.iso.datetime(),
+    })
+  ),
+
+  metadata: z.object({
+    builtAt: z.iso.datetime(),
+    recentOperationsRecordsLimit: z.number(),
+    includedProjectContext: z.boolean(),
+  }),
+});
+
 export type ProjectContext = z.infer<typeof ProjectContextSchema>;
 export type OperationsAnalysis = z.infer<typeof OperationsAnalysisSchema>;
 export type FeedbackEvent = z.infer<typeof FeedbackEventSchema>;
 export type OperationsRecord = z.infer<typeof OperationsRecordSchema>;
 export type RiskType = z.infer<typeof RiskTypeSchema>;
+export type OperationsContextPackage = z.infer<typeof OperationsContextPackageSchema>;
