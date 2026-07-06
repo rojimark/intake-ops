@@ -6,6 +6,7 @@ export const FeedbackEventSchema = z.object({
   receivedAt: z.iso.datetime(),
   status: z.enum(["new", "processing", "review_required", "completed", "failed"]),
   message: z.string(),
+  projectContextId: z.string().nullable().optional(),
 });
 
 export const RiskTypeSchema = z.enum([
@@ -39,6 +40,23 @@ export const OperationsAnalysisSchema = OperationsRecordSchema.omit({
   createdAt: true,
 });
 
+export const ProjectContextSchema = z.object({
+  id: z.string(),
+  projectName: z.string(),
+  clientName: z.string(),
+
+  approvedScope: z.string(),
+  outOfScope: z.string().nullable().optional(),
+  constraints: z.string().nullable().optional(),
+  deadline: z.iso.datetime().nullable().optional(),
+  budgetNotes: z.string().nullable().optional(),
+  communicationTone: z.string().nullable().optional(),
+
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+});
+
+export type ProjectContext = z.infer<typeof ProjectContextSchema>;
 export type OperationsAnalysis = z.infer<typeof OperationsAnalysisSchema>;
 export type FeedbackEvent = z.infer<typeof FeedbackEventSchema>;
 export type OperationsRecord = z.infer<typeof OperationsRecordSchema>;

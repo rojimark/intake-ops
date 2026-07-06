@@ -75,7 +75,7 @@ Risk classification rules:
 - deadline_risk: deadlines are compressed, threatened, or explicitly time-sensitive.
 - scope_creep: new features, deliverables, or requirements are introduced.
 - budget_concern: additional work is requested while budget remains fixed or constrained.
-- unclear_requirements: request is ambiguous or success criteria are missing.
+- unclear_request: request is ambiguous or success criteria are missing.
 - stakeholder_conflict: stakeholders appear to disagree.
 - dependency_risk: delivery depends on external teams, approvals, vendors, or blockers.
 - blocked_work: work cannot proceed because required assets, approvals, access, or dependencies are missing.
@@ -124,7 +124,7 @@ A communication may contain multiple risk flags. Return all applicable risks.`,
         createdAt: new Date().toISOString(),
       };
 
-      addOperationsRecord(operationsRecord);
+      const createdOperationsRecord = await addOperationsRecord(operationsRecord);
 
       const reviewEvent = await updateFeedbackEventStatus(eventId, "review_required");
 
@@ -141,7 +141,7 @@ A communication may contain multiple risk flags. Return all applicable risks.`,
         {
           ok: true,
           event: reviewEvent,
-          operationsRecord,
+           operationsRecord: createdOperationsRecord,
         },
         { status: 200 }
       );

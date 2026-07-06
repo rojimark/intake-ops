@@ -13,6 +13,10 @@ model FeedbackEvent {
   status     String
   message    String
 
+  projectContextId String?
+  projectContext   ProjectContext? @relation(fields: [projectContextId], references: [id], onDelete: SetNull)
+
+
   operationsRecord OperationsRecord?
 }
 
@@ -30,4 +34,22 @@ model OperationsRecord {
   createdAt         DateTime @default(now())
 
   event FeedbackEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model ProjectContext {
+  id                String   @id @default(uuid())
+  projectName       String
+  clientName        String
+
+  approvedScope     String
+  outOfScope        String?
+  constraints       String?
+  deadline          DateTime?
+  budgetNotes       String?
+  communicationTone String?
+
+  feedbackEvents    FeedbackEvent[]
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }

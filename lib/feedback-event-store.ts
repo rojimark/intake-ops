@@ -25,6 +25,7 @@ function toFeedbackEvent(record: {
   receivedAt: Date;
   status: string;
   message: string;
+  projectContextId: string | null;
 }): FeedbackEvent {
   return {
     id: record.id,
@@ -32,6 +33,7 @@ function toFeedbackEvent(record: {
     receivedAt: record.receivedAt.toISOString(),
     status: record.status as FeedbackEvent["status"],
     message: record.message,
+    projectContextId: record.projectContextId,
   };
 }
 
@@ -43,6 +45,7 @@ export async function addFeedbackEvent(event: FeedbackEvent) {
       receivedAt: new Date(event.receivedAt),
       status: event.status,
       message: event.message,
+      projectContextId: event.projectContextId ?? null,
     },
   });
 

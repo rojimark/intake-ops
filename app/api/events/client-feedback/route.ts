@@ -2,6 +2,10 @@ import { type FeedbackEvent } from "@/lib/schema";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { addFeedbackEvent, getFeedbackEvents } from "@/lib/feedback-event-store";
+import {
+  DEFAULT_PROJECT_CONTEXT_ID,
+  getDefaultProjectContext,
+} from "@/lib/project-context-store";
 
 const ClientFeedbackEventInputSchema = z.object({
   source: z.enum(["email", "form", "manual"]),
@@ -24,6 +28,7 @@ export async function POST(request: Request) {
       );
     }
 
+    await getDefaultProjectContext();
     const { source, message } = parsed.data;
 
     const feedbackEvent: FeedbackEvent = {
@@ -32,8 +37,9 @@ export async function POST(request: Request) {
       receivedAt: new Date().toISOString(),
       status: "new",
       message,
+      projectContextId: DEFAULT_PROJECT_CONTEXT_ID,
     };
-
+    
     const createdEvent = await addFeedbackEvent(feedbackEvent);
     return NextResponse.json(
       {
