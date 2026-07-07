@@ -21,17 +21,26 @@ model FeedbackEvent {
 }
 
 model OperationsRecord {
-  id                String   @id @default(uuid())
-  eventId           String   @unique
-  summary           String
-  sentiment         String
-  priority          String
-  needsResponse     Boolean
-  actionItems       Json
-  risks             Json
-  suggestedResponse String
-  confidence        String
-  createdAt         DateTime @default(now())
+  id                  String   @id @default(uuid())
+  eventId             String   @unique
+  summary             String
+  sentiment           String
+  priority            String
+  needsResponse       Boolean
+  actionItems         Json
+  risks               Json
+  suggestedResponse   String
+  confidence          String
+
+  contextVersion      String?
+  scopeAssesment      String?
+  evidence            Json?
+  assumptions         Json?
+  missingInformation  Json?
+  humanReviewReason   String?
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @default(now()) @updatedAt
 
   event FeedbackEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }
