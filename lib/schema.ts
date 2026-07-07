@@ -19,6 +19,12 @@ export const RiskTypeSchema = z.enum([
   "dependency_risk",
 ]);
 
+export const ScopeAssessmentSchema = z.enum([
+  "within_scope",
+  "possible_scope_change",
+  "out_of_scope",
+  "unclear",
+])
 
 export const OperationsRecordSchema = z.object({
   id: z.string(),
@@ -31,13 +37,24 @@ export const OperationsRecordSchema = z.object({
   risks: z.array(RiskTypeSchema),
   suggestedResponse: z.string(),
   confidence: z.enum(["low", "medium", "high"]),
+
+  contextVersion: z.string().nullable().optional(),
+  scopeAssesment: ScopeAssessmentSchema.nullable().optional(),
+  evidence: z.array(z.string().nullable().optional()),
+  assumptions: z.array(z.string().nullable().optional()),
+  missingInformation: z.array(z.string().nullable().optional()),
+  humanReviewReason: z.string().nullable().optional,
+
   createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime().nullable().optional(),
 });
 
 export const OperationsAnalysisSchema = OperationsRecordSchema.omit({
   id: true,
   eventId: true,
   createdAt: true,
+  updatedAt: true,
+  contextVersion: true,
 });
 
 export const ProjectContextSchema = z.object({
@@ -91,4 +108,5 @@ export type OperationsAnalysis = z.infer<typeof OperationsAnalysisSchema>;
 export type FeedbackEvent = z.infer<typeof FeedbackEventSchema>;
 export type OperationsRecord = z.infer<typeof OperationsRecordSchema>;
 export type RiskType = z.infer<typeof RiskTypeSchema>;
+export type ScopeAssessment = z.infer<typeof ScopeAssessmentSchema>;
 export type OperationsContextPackage = z.infer<typeof OperationsContextPackageSchema>;
