@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import { FeedbackEvent, OperationsRecord } from "@/lib/schema";
+import { FeedbackEvent, OperationsRecord, type OperationsContextPackage } from "@/lib/schema";
+
 
 type InboxFilter = "all" | FeedbackEvent["status"];
 
@@ -8,6 +9,7 @@ export default function Inbox() {
   const [events, setEvents] = useState<FeedbackEvent[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<FeedbackEvent | null>(null);
   const [selectedEventRecord, setSelectedEventRecord] = useState<OperationsRecord | null>(null);
+  const [selectedEventContext, setSelectedEventContext] = useState<OperationsContextPackage | null>(null);
   const [isRecordLoading, setIsRecordLoading] = useState(false);
   const [isProcessLoading, setIsProcessLoading] = useState(false);
   const [activeFilter, setActiveFilter] = useState("all");
@@ -71,7 +73,10 @@ export default function Inbox() {
     }
 
     const data = await response.json();
-    return data.record as OperationsRecord | null;
+    return data as {
+      record: OperationsRecord | null;
+      context: OperationsContextPackage | null;
+    };
   }
 
   useEffect(() => {
@@ -96,8 +101,15 @@ export default function Inbox() {
       try {
         setIsRecordLoading(true);
 
-        const record = await getOperationsRecord(selectedEvent.id);
-        setSelectedEventRecord(record);
+        const data = await getOperationsRecord(selectedEvent.id);
+        
+        if (!data) {
+          setSelectedEventRecord(null);
+          setSelectedEventContext(null);
+          return;
+        }
+        setSelectedEventRecord(data.record);
+        setSelectedEventContext(data.context);
       } catch (error) {
         console.error("Failed to fetch operations record:", error);
         setSelectedEventRecord(null);
