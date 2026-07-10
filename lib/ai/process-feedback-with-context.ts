@@ -51,6 +51,11 @@ General rules:
 - Do not promise delivery when scope, deadline, budget, or feasibility requires review.
 - Follow the project's communication tone when drafting the suggested response.
 - humanReviewReason must explain why human review is needed, or be null when review is unnecessary.
+- A feedback message may contain both within-scope work and possible scope changes. Evaluate the individual requested changes before assigning the overall scopeAssessment.
+- Do not classify bug fixes, responsive fixes, or existing-page content polish as scope creep when they are explicitly covered by the approved scope.
+- If scopeAssessment is possible_scope_change, out_of_scope, or unclear, humanReviewReason must not be null.
+- If risks includes scope_creep, deadline_risk, or budget_concern, humanReviewReason must explain what requires human review.
+- Suggested responses should distinguish work that appears covered by the approved scope from work that still requires feasibility or scope review.
 
 Risk classification rules:
 - deadline_risk: deadlines are compressed, threatened, or explicitly time-sensitive.
