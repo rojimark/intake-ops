@@ -249,8 +249,8 @@ export default function Inbox() {
               type="button"
               onClick={() => setActiveFilter(filter.value as InboxFilter)}
               className={`rounded-full px-3 py-1 text-xs font-medium ${activeFilter === filter.value
-                  ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
-                  : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
+                : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
                 }`}
             >
               {filter.label}
@@ -415,6 +415,85 @@ export default function Inbox() {
                             <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
                               {selectedEventRecord.confidence}
                             </p>
+                          </div>
+                        </div>
+                        <div className="border-t border-zinc-200 pt-4 dark:border-zinc-800">
+                          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                            Context-Aware Analysis
+                          </p>
+
+                          <div className="space-y-4">
+                            <div>
+                              <p className="text-xs text-zinc-400">Scope Assessment</p>
+                              <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                                {selectedEventRecord.scopeAssessment ?? "Not assessed"}
+                              </p>
+                            </div>
+
+                            <div>
+                              <p className="text-xs text-zinc-400">Evidence</p>
+
+                              {selectedEventRecord.evidence?.length ? (
+                                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-zinc-700 dark:text-zinc-300">
+                                  {selectedEventRecord.evidence.map((item, index) => (
+                                    <li key={`${item}-${index}`}>{item}</li>
+                                  ))}
+                                </ul>
+                              ) : (
+                                <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                                  No evidence recorded.
+                                </p>
+                              )}
+                            </div>
+
+                            <div>
+                              <p className="text-xs text-zinc-400">Assumptions</p>
+
+                              {selectedEventRecord.assumptions?.length ? (
+                                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-zinc-700 dark:text-zinc-300">
+                                  {selectedEventRecord.assumptions.map((item, index) => (
+                                    <li key={`${item}-${index}`}>{item}</li>
+                                  ))}
+                                </ul>
+                              ) : (
+                                <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                                  No assumptions recorded.
+                                </p>
+                              )}
+                            </div>
+
+                            <div>
+                              <p className="text-xs text-zinc-400">Missing Information</p>
+
+                              {selectedEventRecord.missingInformation?.length ? (
+                                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-zinc-700 dark:text-zinc-300">
+                                  {selectedEventRecord.missingInformation.map((item, index) => (
+                                    <li key={`${item}-${index}`}>{item}</li>
+                                  ))}
+                                </ul>
+                              ) : (
+                                <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                                  No missing information identified.
+                                </p>
+                              )}
+                            </div>
+
+                            <div>
+                              <p className="text-xs text-zinc-400">Human Review Reason</p>
+                              <p className="mt-1 text-sm text-zinc-700 dark:text-zinc-300">
+                                {typeof selectedEventRecord.humanReviewReason === "string" &&
+                                  selectedEventRecord.humanReviewReason.trim()
+                                  ? selectedEventRecord.humanReviewReason
+                                  : "No additional human review reason recorded."}
+                              </p>
+                            </div>
+
+                            <div>
+                              <p className="text-xs text-zinc-400">Context Version</p>
+                              <p className="font-mono text-xs text-zinc-500 dark:text-zinc-400">
+                                {selectedEventRecord.contextVersion ?? "Legacy analysis"}
+                              </p>
+                            </div>
                           </div>
                         </div>
 
