@@ -47,16 +47,19 @@ export async function buildOperationsContext(
 
   const recentOperationsRecords = event.projectContextId
     ? await prisma.operationsRecord.findMany({
-        where: {
-          event: {
-            projectContextId: event.projectContextId,
-          },
+      where: {
+        eventId: {
+          not: eventId,
         },
-        orderBy: {
-          createdAt: "desc",
+        event: {
+          projectContextId: event.projectContextId,
         },
-        take: RECENT_OPERATIONS_RECORDS_LIMIT,
-      })
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: RECENT_OPERATIONS_RECORDS_LIMIT,
+    })
     : [];
 
   const contextPackage: OperationsContextPackage = {
@@ -71,18 +74,18 @@ export async function buildOperationsContext(
 
     projectContext: event.projectContext
       ? {
-          id: event.projectContext.id,
-          projectName: event.projectContext.projectName,
-          clientName: event.projectContext.clientName,
-          approvedScope: event.projectContext.approvedScope,
-          outOfScope: event.projectContext.outOfScope,
-          constraints: event.projectContext.constraints,
-          deadline: event.projectContext.deadline?.toISOString() ?? null,
-          budgetNotes: event.projectContext.budgetNotes,
-          communicationTone: event.projectContext.communicationTone,
-          createdAt: event.projectContext.createdAt.toISOString(),
-          updatedAt: event.projectContext.updatedAt.toISOString(),
-        }
+        id: event.projectContext.id,
+        projectName: event.projectContext.projectName,
+        clientName: event.projectContext.clientName,
+        approvedScope: event.projectContext.approvedScope,
+        outOfScope: event.projectContext.outOfScope,
+        constraints: event.projectContext.constraints,
+        deadline: event.projectContext.deadline?.toISOString() ?? null,
+        budgetNotes: event.projectContext.budgetNotes,
+        communicationTone: event.projectContext.communicationTone,
+        createdAt: event.projectContext.createdAt.toISOString(),
+        updatedAt: event.projectContext.updatedAt.toISOString(),
+      }
       : null,
 
     recentOperationsRecords: recentOperationsRecords.map((record) => ({
