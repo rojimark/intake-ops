@@ -39,7 +39,7 @@ export const OperationsRecordSchema = z.object({
   confidence: z.enum(["low", "medium", "high"]),
 
   contextVersion: z.string().nullable().optional(),
-  scopeAssesment: ScopeAssessmentSchema.nullable().optional(),
+  scopeAssessment: ScopeAssessmentSchema.nullable().optional(),
   evidence: z.array(z.string().nullable().optional()),
   assumptions: z.array(z.string().nullable().optional()),
   missingInformation: z.array(z.string().nullable().optional()),

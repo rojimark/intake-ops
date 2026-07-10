@@ -117,11 +117,15 @@ A communication may contain multiple risk flags. Return all applicable risks.`,
         );
       }
 
+      const now = new Date().toISOString();
+
       const operationsRecord: OperationsRecord = {
         id: crypto.randomUUID(),
         eventId,
         ...analysis.data,
-        createdAt: new Date().toISOString(),
+        contextVersion: null,
+        createdAt: now,
+        updatedAt: now,
       };
 
       const createdOperationsRecord = await addOperationsRecord(operationsRecord);
@@ -141,7 +145,7 @@ A communication may contain multiple risk flags. Return all applicable risks.`,
         {
           ok: true,
           event: reviewEvent,
-           operationsRecord: createdOperationsRecord,
+          operationsRecord: createdOperationsRecord,
         },
         { status: 200 }
       );

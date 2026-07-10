@@ -33,7 +33,7 @@ model OperationsRecord {
   confidence          String
 
   contextVersion      String?
-  scopeAssesment      String?
+  scopeAssessment     String?
   evidence            Json?
   assumptions         Json?
   missingInformation  Json?
