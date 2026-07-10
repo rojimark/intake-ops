@@ -1,3 +1,4 @@
+import * as z from "zod";
 import { getOpenAIClient } from "@/lib/openai";
 import {
     OperationsAnalysisSchema,
@@ -12,6 +13,9 @@ export async function processFeedbackWithContext(
     context: OperationsContextPackage
 ): Promise<OperationsAnalysis> {
     const client = getOpenAIClient();
+
+    const jsonSchema = z.toJSONSchema(OperationsAnalysisSchema);
+    console.log(JSON.stringify(jsonSchema, null, 2));
 
     const response = await client.responses.create({
         model: MODEL,
@@ -68,7 +72,7 @@ A communication may contain multiple risk flags. Return every applicable risk. R
             format: {
                 type: "json_schema",
                 name: "context_aware_operations_analysis",
-                schema: OperationsAnalysisSchema.toJSONSchema(),
+                schema: jsonSchema,
             },
         },
     });

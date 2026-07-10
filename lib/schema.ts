@@ -26,6 +26,23 @@ export const ScopeAssessmentSchema = z.enum([
   "unclear",
 ])
 
+export const OperationsAnalysisSchema = z.object({
+  summary: z.string(),
+  sentiment: z.enum(["positive", "negative", "neutral"]),
+  priority: z.enum(["high", "medium", "low"]),
+  needsResponse: z.boolean(),
+  actionItems: z.array(z.string()),
+  risks: z.array(RiskTypeSchema),
+  suggestedResponse: z.string(),
+  confidence: z.enum(["low", "medium", "high"]),
+
+  scopeAssessment: ScopeAssessmentSchema,
+  evidence: z.array(z.string()),
+  assumptions: z.array(z.string()),
+  missingInformation: z.array(z.string()),
+  humanReviewReason: z.string().nullable(),
+});
+
 export const OperationsRecordSchema = z.object({
   id: z.string(),
   eventId: z.string(),
@@ -49,13 +66,7 @@ export const OperationsRecordSchema = z.object({
   updatedAt: z.iso.datetime().nullable().optional(),
 });
 
-export const OperationsAnalysisSchema = OperationsRecordSchema.omit({
-  id: true,
-  eventId: true,
-  createdAt: true,
-  updatedAt: true,
-  contextVersion: true,
-});
+
 
 export const ProjectContextSchema = z.object({
   id: z.string(),
