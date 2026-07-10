@@ -56,6 +56,9 @@ General rules:
 - If scopeAssessment is possible_scope_change, out_of_scope, or unclear, humanReviewReason must not be null.
 - If risks includes scope_creep, deadline_risk, or budget_concern, humanReviewReason must explain what requires human review.
 - Suggested responses should distinguish work that appears covered by the approved scope from work that still requires feasibility or scope review.
+- Do not use work explicitly listed in approvedScope as evidence of scope creep.
+- When a message contains mixed requests, evidence must identify which items are within scope and which specific items may change scope.
+- Only classify navigation work as a possible scope change when it requires restructuring information architecture, adding pages, or introducing new navigation behavior beyond minor usability fixes.
 
 Risk classification rules:
 - deadline_risk: deadlines are compressed, threatened, or explicitly time-sensitive.
