@@ -509,12 +509,22 @@ export default function Inbox() {
                           </div>
                         </div>
                         {selectedEventContext && (
-                          <div className="border-t border-zinc-200 pt-4 dark:border-zinc-800">
-                            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400">
-                              Context Used
-                            </p>
+                          <details className="group border-t border-zinc-200 pt-4 dark:border-zinc-800">
+                            <summary className="flex cursor-pointer list-none items-center justify-between">
+                              <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                                Context Used
+                              </span>
 
-                            <div className="space-y-4">
+                              <span className="text-xs text-zinc-500 group-open:hidden">
+                                Show details
+                              </span>
+
+                              <span className="hidden text-xs text-zinc-500 group-open:inline">
+                                Hide details
+                              </span>
+                            </summary>
+
+                            <div className="mt-4 space-y-4">
                               <div>
                                 <p className="text-xs text-zinc-400">Project</p>
                                 <p className="mt-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
@@ -612,7 +622,7 @@ export default function Inbox() {
                                 </p>
                               </div>
                             </div>
-                          </div>
+                          </details>
                         )}
 
                         <div>
