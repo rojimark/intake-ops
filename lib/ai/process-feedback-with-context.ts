@@ -1,25 +1,25 @@
 import { getOpenAIClient } from "@/lib/openai";
 import {
-  OperationsAnalysisSchema,
-  type OperationsAnalysis,
-  type OperationsContextPackage,
+    OperationsAnalysisSchema,
+    type OperationsAnalysis,
+    type OperationsContextPackage,
 } from "@/lib/schema";
 
 const MODEL = "gpt-4o-mini";
 const MAX_OUTPUT_TOKENS = 1200;
 
 export async function processFeedbackWithContext(
-  context: OperationsContextPackage
+    context: OperationsContextPackage
 ): Promise<OperationsAnalysis> {
-  const client = getOpenAIClient();
+    const client = getOpenAIClient();
 
-  const response = await client.responses.create({
-    model: MODEL,
-    max_output_tokens: MAX_OUTPUT_TOKENS,
-    input: [
-      {
-        role: "system",
-        content: `You are an AI operations analyst for a client services team.
+    const response = await client.responses.create({
+        model: MODEL,
+        max_output_tokens: MAX_OUTPUT_TOKENS,
+        input: [
+            {
+                role: "system",
+                content: `You are an AI operations analyst for a client services team.
 
 Analyze the current client feedback using the provided project context. Do not analyze the feedback in isolation.
 
@@ -58,48 +58,48 @@ Risk classification rules:
 - blocked_work: work cannot proceed because required assets, approvals, access, or dependencies are missing.
 
 A communication may contain multiple risk flags. Return every applicable risk. Return an empty risks array when no risk clearly applies.`,
-      },
-      {
-        role: "user",
-        content: buildContextPrompt(context),
-      },
-    ],
-    text: {
-      format: {
-        type: "json_schema",
-        name: "context_aware_operations_analysis",
-        schema: OperationsAnalysisSchema.toJSONSchema(),
-      },
-    },
-  });
+            },
+            {
+                role: "user",
+                content: buildContextPrompt(context),
+            },
+        ],
+        text: {
+            format: {
+                type: "json_schema",
+                name: "context_aware_operations_analysis",
+                schema: OperationsAnalysisSchema.toJSONSchema(),
+            },
+        },
+    });
 
-  const parsedJson: unknown = JSON.parse(response.output_text);
-  const analysis = OperationsAnalysisSchema.safeParse(parsedJson);
+    const parsedJson: unknown = JSON.parse(response.output_text);
+    const analysis = OperationsAnalysisSchema.safeParse(parsedJson);
 
-  if (!analysis.success) {
-    throw new Error(
-      `AI response did not match the operations analysis schema: ${analysis.error.message}`
-    );
-  }
+    if (!analysis.success) {
+        throw new Error(
+            `AI response did not match the operations analysis schema: ${analysis.error.message}`
+        );
+    }
 
-  return analysis.data;
+    return analysis.data;
 }
 
 function buildContextPrompt(context: OperationsContextPackage): string {
-  const project = context.projectContext;
+    const project = context.projectContext;
 
-  const recentHistory =
-    context.recentOperationsRecords.length > 0
-      ? context.recentOperationsRecords
-          .map(
-            (record, index) => `${index + 1}. ${record.summary}
+    const recentHistory =
+        context.recentOperationsRecords.length > 0
+            ? context.recentOperationsRecords
+                .map(
+                    (record, index) => `${index + 1}. ${record.summary}
 Priority: ${record.priority}
 Risks: ${record.risks.join(", ") || "none"}`
-          )
-          .join("\n\n")
-      : "No recent operations records.";
+                )
+                .join("\n\n")
+            : "No recent operations records.";
 
-  return `CURRENT FEEDBACK EVENT
+    return `CURRENT FEEDBACK EVENT
 Source: ${context.event.source}
 Received at: ${context.event.receivedAt}
 Message:
