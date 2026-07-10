@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getOperationsRecordByEventId } from "@/lib/operations-record-store";
+import { buildOperationsContext } from "@/lib/context/build-operations-context";
 
 interface Context {
   params: Promise<{ eventId: string }>;
@@ -17,6 +18,9 @@ export async function GET(_request: Request, context: Context) {
     }
 
     const record = await getOperationsRecordByEventId(eventId);
+    const operationsContext = record
+      ? await buildOperationsContext(eventId)
+      : null;
 
     if (!record) {
       return NextResponse.json(
@@ -26,7 +30,10 @@ export async function GET(_request: Request, context: Context) {
     }
 
     return NextResponse.json(
-      { record },
+      {
+        record,
+        context: operationsContext,
+      },
       { status: 200 }
     );
   } catch (error) {
