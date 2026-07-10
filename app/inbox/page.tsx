@@ -442,53 +442,80 @@ export default function Inbox() {
                               </p>
                             </div>
 
-                            <div>
-                              <p className="text-xs text-zinc-400">Evidence</p>
+                            <details className="group rounded-lg border border-zinc-200 p-3 dark:border-zinc-800">
+                              <summary className="flex cursor-pointer list-none items-center justify-between">
+                                <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                                  Analysis Details
+                                </span>
 
-                              {selectedEventRecord.evidence?.length ? (
-                                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-zinc-700 dark:text-zinc-300">
-                                  {selectedEventRecord.evidence.map((item, index) => (
-                                    <li key={`${item}-${index}`}>{item}</li>
-                                  ))}
-                                </ul>
-                              ) : (
-                                <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                                  No evidence recorded.
-                                </p>
-                              )}
-                            </div>
+                                <span className="text-xs text-zinc-500 group-open:hidden">
+                                  Show details
+                                </span>
 
-                            <div>
-                              <p className="text-xs text-zinc-400">Assumptions</p>
+                                <span className="hidden text-xs text-zinc-500 group-open:inline">
+                                  Hide details
+                                </span>
+                              </summary>
 
-                              {selectedEventRecord.assumptions?.length ? (
-                                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-zinc-700 dark:text-zinc-300">
-                                  {selectedEventRecord.assumptions.map((item, index) => (
-                                    <li key={`${item}-${index}`}>{item}</li>
-                                  ))}
-                                </ul>
-                              ) : (
-                                <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                                  No assumptions recorded.
-                                </p>
-                              )}
-                            </div>
+                              <div className="mt-4 space-y-4">
+                                <div>
+                                  <p className="text-xs text-zinc-400">Evidence</p>
 
-                            <div>
-                              <p className="text-xs text-zinc-400">Missing Information</p>
+                                  {selectedEventRecord.evidence?.length ? (
+                                    <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-zinc-700 dark:text-zinc-300">
+                                      {selectedEventRecord.evidence.map((item, index) => (
+                                        <li key={`${item}-${index}`}>{item}</li>
+                                      ))}
+                                    </ul>
+                                  ) : (
+                                    <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                                      No evidence recorded.
+                                    </p>
+                                  )}
+                                </div>
 
-                              {selectedEventRecord.missingInformation?.length ? (
-                                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-zinc-700 dark:text-zinc-300">
-                                  {selectedEventRecord.missingInformation.map((item, index) => (
-                                    <li key={`${item}-${index}`}>{item}</li>
-                                  ))}
-                                </ul>
-                              ) : (
-                                <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                                  No missing information identified.
-                                </p>
-                              )}
-                            </div>
+                                <div>
+                                  <p className="text-xs text-zinc-400">Assumptions</p>
+
+                                  {selectedEventRecord.assumptions?.length ? (
+                                    <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-zinc-700 dark:text-zinc-300">
+                                      {selectedEventRecord.assumptions.map((item, index) => (
+                                        <li key={`${item}-${index}`}>{item}</li>
+                                      ))}
+                                    </ul>
+                                  ) : (
+                                    <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                                      No assumptions recorded.
+                                    </p>
+                                  )}
+                                </div>
+
+                                <div>
+                                  <p className="text-xs text-zinc-400">Missing Information</p>
+
+                                  {selectedEventRecord.missingInformation?.length ? (
+                                    <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-zinc-700 dark:text-zinc-300">
+                                      {selectedEventRecord.missingInformation.map((item, index) => (
+                                        <li key={`${item}-${index}`}>{item}</li>
+                                      ))}
+                                    </ul>
+                                  ) : (
+                                    <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                                      No missing information identified.
+                                    </p>
+                                  )}
+                                </div>
+
+                                <div>
+                                  <p className="text-xs text-zinc-400">Context Version</p>
+                                  <p className="font-mono text-xs text-zinc-500 dark:text-zinc-400">
+                                    {selectedEventRecord.contextVersion ?? "Legacy analysis"}
+                                  </p>
+                                </div>
+                              </div>
+                            </details>
+
+
 
                             <div>
                               <p className="text-xs text-zinc-400">Human Review Reason</p>
@@ -500,12 +527,7 @@ export default function Inbox() {
                               </p>
                             </div>
 
-                            <div>
-                              <p className="text-xs text-zinc-400">Context Version</p>
-                              <p className="font-mono text-xs text-zinc-500 dark:text-zinc-400">
-                                {selectedEventRecord.contextVersion ?? "Legacy analysis"}
-                              </p>
-                            </div>
+
                           </div>
                         </div>
                         {selectedEventContext && (
