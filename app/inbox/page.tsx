@@ -102,7 +102,7 @@ export default function Inbox() {
         setIsRecordLoading(true);
 
         const data = await getOperationsRecord(selectedEvent.id);
-        
+
         if (!data) {
           setSelectedEventRecord(null);
           setSelectedEventContext(null);
@@ -508,6 +508,112 @@ export default function Inbox() {
                             </div>
                           </div>
                         </div>
+                        {selectedEventContext && (
+                          <div className="border-t border-zinc-200 pt-4 dark:border-zinc-800">
+                            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                              Context Used
+                            </p>
+
+                            <div className="space-y-4">
+                              <div>
+                                <p className="text-xs text-zinc-400">Project</p>
+                                <p className="mt-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                                  {selectedEventContext.projectContext?.projectName ??
+                                    "No project context"}
+                                </p>
+
+                                {selectedEventContext.projectContext?.clientName && (
+                                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                                    {selectedEventContext.projectContext.clientName}
+                                  </p>
+                                )}
+                              </div>
+
+                              <div>
+                                <p className="text-xs text-zinc-400">Approved Scope</p>
+                                <p className="mt-1 whitespace-pre-line text-sm text-zinc-700 dark:text-zinc-300">
+                                  {selectedEventContext.projectContext?.approvedScope ??
+                                    "No approved scope recorded."}
+                                </p>
+                              </div>
+
+                              <div>
+                                <p className="text-xs text-zinc-400">Out-of-Scope Items</p>
+                                <p className="mt-1 whitespace-pre-line text-sm text-zinc-700 dark:text-zinc-300">
+                                  {selectedEventContext.projectContext?.outOfScope ??
+                                    "No out-of-scope items recorded."}
+                                </p>
+                              </div>
+
+                              <div>
+                                <p className="text-xs text-zinc-400">Constraints</p>
+                                <p className="mt-1 whitespace-pre-line text-sm text-zinc-700 dark:text-zinc-300">
+                                  {selectedEventContext.projectContext?.constraints ??
+                                    "No project constraints recorded."}
+                                </p>
+                              </div>
+
+                              <div className="grid gap-4 sm:grid-cols-2">
+                                <div>
+                                  <p className="text-xs text-zinc-400">Deadline</p>
+                                  <p className="mt-1 text-sm text-zinc-700 dark:text-zinc-300">
+                                    {selectedEventContext.projectContext?.deadline
+                                      ? new Date(
+                                        selectedEventContext.projectContext.deadline
+                                      ).toLocaleString()
+                                      : "No deadline recorded."}
+                                  </p>
+                                </div>
+
+                                <div>
+                                  <p className="text-xs text-zinc-400">Budget Notes</p>
+                                  <p className="mt-1 text-sm text-zinc-700 dark:text-zinc-300">
+                                    {selectedEventContext.projectContext?.budgetNotes ??
+                                      "No budget notes recorded."}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div>
+                                <p className="text-xs text-zinc-400">Recent Operations History</p>
+
+                                {selectedEventContext.recentOperationsRecords.length > 0 ? (
+                                  <div className="mt-2 space-y-2">
+                                    {selectedEventContext.recentOperationsRecords.map((record) => (
+                                      <div
+                                        key={record.id}
+                                        className="rounded-lg border border-zinc-200 p-3 dark:border-zinc-800"
+                                      >
+                                        <p className="text-sm text-zinc-700 dark:text-zinc-300">
+                                          {record.summary}
+                                        </p>
+
+                                        <div className="mt-2 flex flex-wrap gap-2 text-xs text-zinc-500">
+                                          <span>Priority: {record.priority}</span>
+                                          <span>
+                                            Risks: {record.risks.join(", ") || "none"}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                                    No previous operations records were included.
+                                  </p>
+                                )}
+                              </div>
+
+                              <div>
+                                <p className="text-xs text-zinc-400">Context Metadata</p>
+                                <p className="mt-1 font-mono text-xs text-zinc-500 dark:text-zinc-400">
+                                  {selectedEventContext.contextVersion} · built{" "}
+                                  {new Date(selectedEventContext.metadata.builtAt).toLocaleString()}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
 
                         <div>
                           <p className="text-xs text-zinc-400">Action Items</p>
