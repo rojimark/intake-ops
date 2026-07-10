@@ -53,6 +53,7 @@ export async function buildOperationsContext(
         },
         event: {
           projectContextId: event.projectContextId,
+          status: "completed",
         },
       },
       orderBy: {

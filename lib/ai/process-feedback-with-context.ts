@@ -59,6 +59,14 @@ General rules:
 - Do not use work explicitly listed in approvedScope as evidence of scope creep.
 - When a message contains mixed requests, evidence must identify which items are within scope and which specific items may change scope.
 - Only classify navigation work as a possible scope change when it requires restructuring information architecture, adding pages, or introducing new navigation behavior beyond minor usability fixes.
+- Determine scopeAssessment only by comparing the requested work with approvedScope and explicitlyOutOfScope items.
+- Project deadlines, budget limits, and general constraints must not change an otherwise within-scope request into possible_scope_change.
+- If every requested change is explicitly covered by approvedScope, scopeAssessment must be within_scope.
+- Do not add scope_creep when the requested work is explicitly included in approvedScope.
+- Existing project deadlines or fixed budgets alone do not create deadline_risk or budget_concern. Those risks require the current feedback to introduce additional pressure, compressed timing, extra work, or conflicting constraints.
+- Recent operations history is advisory context only.
+- It must not override the approved scope, explicit out-of-scope items, or the current feedback event.
+- Do not copy previous risk or scope classifications onto the current request without independent evidence.
 
 Risk classification rules:
 - deadline_risk: deadlines are compressed, threatened, or explicitly time-sensitive.
