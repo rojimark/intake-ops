@@ -20,6 +20,9 @@
     "zod": "^4.4.3",
     "zod-to-json-schema": "^3.25.2"
   },
+   "optionalDependencies": {
+    "lightningcss-darwin-arm64": "^1.22.0"
+  },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
@@ -30,5 +33,9 @@
     "eslint-config-next": "16.2.9",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+    "supportedArchitectures": {
+    "os": ["darwin", "win32"],
+    "cpu": ["arm64", "x64"]
   }
 }
