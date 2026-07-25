@@ -57,10 +57,10 @@ export const OperationsRecordSchema = z.object({
 
   contextVersion: z.string().nullable().optional(),
   scopeAssessment: ScopeAssessmentSchema.nullable().optional(),
-  evidence: z.array(z.string().nullable().optional()),
-  assumptions: z.array(z.string().nullable().optional()),
-  missingInformation: z.array(z.string().nullable().optional()),
-  humanReviewReason: z.string().nullable().optional,
+  evidence: z.array(z.string()),
+  assumptions: z.array(z.string()),
+  missingInformation: z.array(z.string()),
+  humanReviewReason: z.string().nullable().optional(),
 
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime().nullable().optional(),

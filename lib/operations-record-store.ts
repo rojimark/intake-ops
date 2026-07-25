@@ -59,11 +59,11 @@ function toOperationsRecord(record: {
 
     contextVersion: record.contextVersion,
     scopeAssessment:
-      record.scopeAssessment as OperationsRecord["scopeAssessment"],
+    record.scopeAssessment as OperationsRecord["scopeAssessment"],
     evidence: toStringArray(record.evidence),
     assumptions: toStringArray(record.assumptions),
     missingInformation: toStringArray(record.missingInformation),
-    humanReviewReason: record.humanReviewReason,
+    humanReviewReason: toNullableString(record.humanReviewReason),
 
     createdAt: record.createdAt.toISOString(),
     updatedAt: record.updatedAt.toISOString(),
