@@ -3,10 +3,8 @@ import {
   updateFeedbackEventStatus,
   getFeedbackEventById,
 } from "@/lib/feedback-event-store";
+import { analyzeFeedbackEvent } from "@/lib/workflows/analyze-feedback-event";
 import { addOperationsRecord } from "@/lib/operations-record-store";
-import { type OperationsRecord } from "@/lib/schema";
-import { buildOperationsContext } from "@/lib/context/build-operations-context";
-import { processFeedbackWithContext } from "@/lib/ai/process-feedback-with-context";
 
 interface Context {
   params: Promise<{ eventId: string }>;
@@ -49,22 +47,7 @@ export async function POST(_request: Request, context: Context) {
     }
 
     try {
-
-      const operationsContext = await buildOperationsContext(eventId);
-      const analysis = await processFeedbackWithContext(operationsContext);
-      const now = new Date().toISOString();
-
-      const operationsRecord: OperationsRecord = {
-        id: crypto.randomUUID(),
-        eventId,
-        ...analysis,
-        contextVersion: operationsContext.contextVersion,
-        createdAt: now,
-        updatedAt: now,
-      };
-
-      const createdOperationsRecord = await addOperationsRecord(operationsRecord);
-
+      const createdOperationsRecord = await analyzeFeedbackEvent(eventId);
       const reviewEvent = await updateFeedbackEventStatus(eventId, "review_required");
 
       if (!reviewEvent) {
